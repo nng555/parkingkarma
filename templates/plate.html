@@ -1,0 +1,23 @@
+<html>
+  <head>
+  </head>
+  <body>
+    Plate: {{ plate.license }}<br>
+    Score: {{ plate.score }}<br>
+    <table>
+      <tr>
+        <td>Score</td>
+        <td>Time</td>
+        <td>Location</td>
+        <td>Message</td>
+      </tr>
+    {% for karma in karmas %}
+      <tr>
+        <td>{{ karma.val }}</td>
+        <td>{{ karma.time }}</td>
+        <td>{{ karma.location }}</td>
+        <td>{{ karma.message }}</td>
+      </tr>
+    {% endfor %}
+  </body>
+</html>
