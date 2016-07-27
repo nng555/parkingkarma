@@ -27,6 +27,7 @@ import jinja2
 import webapp2
 import base64
 import os
+from time import gmtime, strftime
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -35,35 +36,54 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class Karma(ndb.Model):
     license = ndb.StringProperty()
-    time = ndb.DateTimeProperty()
+    time = ndb.StringProperty()
     message = ndb.StringProperty()
-    location = ndb.Stringproperty()
-    val = ndb.BooleanProperty()
+    location = ndb.StringProperty()
+    karmaVal = ndb.BooleanProperty()
 
 class Plate(ndb.Model):
     license = ndb.StringProperty()
-    score = ndb.IntProperty()
+    score = ndb.IntegerProperty()
 
 class IndexHandler(webapp2.RequestHandler):
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/index.html')
-        self.response.write(template.render({'message_url': blobstore.create_upload_url('/message')}))
+        self.response.write(template.render({'karma_url': blobstore.create_upload_url('/karma')}))
 
 class KarmaHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
         karma = Karma()
-        karma_keys = ['license', 'message', 'location', 'val']
+        setattr(karma, 'time', strftime("%Y-%m-%d %H:%M:%S"))
+        setattr(karma, 'karmaVal', (self.request.get('karmaVal') == "on"))
+        karma_keys = ['license', 'message', 'location']
         for key in karma_keys:
             val = self.request.get_all(key)
             setattr(karma, key, val[0])
         karma.put()
-        self.redirect("/plate/{}".format()hacker.license.title())
+        plates = Plate.query(Plate.license == karma.license).fetch(1)
+        if(plates):
+            plate = plates[0]
+            if(karma.karmaVal):
+                plate.score = plate.score + 1
+            else:
+                plate.score = plate.score - 1
+            plate.put()
+        else:
+            plate = Plate()
+            setattr(plate, 'license', karma.license)
+            if(karma.karmaVal):
+                setattr(plate, 'score', 1)
+            else:
+                setattr(plate, 'score', -1)
+            plate.put()
+        self.redirect("/plate/{}".format(plate.license))
 
 class PlateHandler(webapp2.RequestHandler):
     def get(self, license):
-        karmas = Karma.query(Karma.license == license && Karma.message != "").fetch()
+        plate = (Plate.query(Plate.license == license).fetch(1))[0]
+        karmas = Karma.query(Karma.license == license and Karma.message != "").fetch()
         template = JINJA_ENVIRONMENT.get_template('templates/plate.html')
-        self.response.write(template.render({'karmas': karmas}))
+        self.response.write(template.render({'karmas': karmas, 'plate': plate}))
 
 # [START app]
 app = webapp2.WSGIApplication([

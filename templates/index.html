@@ -1,0 +1,21 @@
+<html>
+  <head>
+  </head>
+  <body>
+    Parking Karma! <br>
+    Rate other people's parking and give them good or bad karma. <br>
+    <form action='{{ karma_url }}' method="post" enctype="multipart/form-data">
+      <input type="text" name="license" id="license" placeholder="License Plate" required><br>
+      <input type="text" name="message" id="message" placeholder="Message" required><br>
+      <input type="text" name="location" id="location" placeholder="Location" required><br>
+      <input type="checkbox" name="karmaVal" id="karmaVal"> +1 <br>
+      <input type="submit" name="karma" value="Send Message!"><br>
+    </form>
+    <input type="button" name="search" id="search" value="Search!">
+    <script>
+      document.getElementById('search').onclick = function() {
+        window.location = '/plate/' + document.getElementById('license').value;
+      };
+    </script>
+  </body>
+</html
