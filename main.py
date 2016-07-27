@@ -84,8 +84,11 @@ class PlateHandler(webapp2.RequestHandler):
         if(plates):
             plate = plates[0]
         else:
-            self.redirect("/")
-        karmas = Karma.query(Karma.license == license and Karma.message != "").fetch()
+            plate = Plate()
+            setattr(plate, 'license', license)
+            setattr(plate, 'score', 0)
+            plate.put()
+        karmas = Karma.query(Karma.license == plate.license, Karma.message != "").fetch()
         template = JINJA_ENVIRONMENT.get_template('templates/plate.html')
         self.response.write(template.render({'karmas': karmas, 'plate': plate}))
 

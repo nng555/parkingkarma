@@ -10,6 +10,7 @@
         <td>Time</td>
         <td>Location</td>
         <td>Message</td>
+        <td>Plate</td>
       </tr>
     {% for karma in karmas %}
       <tr>
@@ -17,6 +18,7 @@
         <td>{{ karma.time }}</td>
         <td>{{ karma.location }}</td>
         <td>{{ karma.message }}</td>
+        <td>{{ karma.license }}</td>
       </tr>
     {% endfor %}
   </body>
