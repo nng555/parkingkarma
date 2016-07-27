@@ -80,7 +80,11 @@ class KarmaHandler(blobstore_handlers.BlobstoreUploadHandler):
 
 class PlateHandler(webapp2.RequestHandler):
     def get(self, license):
-        plate = (Plate.query(Plate.license == license).fetch(1))[0]
+        plates = Plate.query(Plate.license == license).fetch(1)
+        if(plates):
+            plate = plates[0]
+        else:
+            self.redirect("/")
         karmas = Karma.query(Karma.license == license and Karma.message != "").fetch()
         template = JINJA_ENVIRONMENT.get_template('templates/plate.html')
         self.response.write(template.render({'karmas': karmas, 'plate': plate}))
